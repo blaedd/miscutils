@@ -49,7 +49,6 @@ NTYPES = {
 }
 
 
-@functools.total_ordering
 class KeytabEntry(object):
     """An entry in the Keytab."""
 
@@ -74,38 +73,15 @@ class KeytabEntry(object):
             return False
         return True
 
-    def __lt__(self, other):
-        if not isinstance(other, KeytabEntry):
-            return NotImplemented
-
-        return (
-            (self.vno,
-             self.realm,
-             self.name,
-             self._key['type'],
-             self.timestamp) <
-            (other.vno,
-             other.realm,
-             other.name,
-             other._key['type'],
-             other.timestamp))
-
     def __eq__(self, other):
         if not isinstance(other, KeytabEntry):
             return NotImplemented
-        return (
-            (self.vno,
-             self.realm,
-             self.name,
-             self._key['type'],
-             self.key,
-             self.timestamp) ==
-            (other.vno,
-             other.realm,
-             other.name,
-             other._key['type'],
-             other.key,
-             other.timestamp))
+        if self._data:
+            return self._data.__eq__(other)
+        return False
+
+    def __hash__(self):
+        return self._data.__hash__()
 
     def __str__(self):
         return '%s@%s/%s VNO:%d' % (self.name, self._realm, self.key_type,
